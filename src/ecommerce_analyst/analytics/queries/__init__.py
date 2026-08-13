@@ -1,0 +1,1 @@
+"""Reusable deterministic query definitions."""
