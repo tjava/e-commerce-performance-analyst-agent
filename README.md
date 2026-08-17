@@ -72,6 +72,7 @@ Supported variables:
 - `ECOMMERCE_ANALYST_RAW_DATA_DIR`
 - `ECOMMERCE_ANALYST_PROCESSED_DATA_DIR`
 - `ECOMMERCE_ANALYST_SAMPLE_DATA_DIR`
+- `ECOMMERCE_ANALYST_MAX_UPLOAD_SIZE_BYTES`
 
 Use `ECOMMERCE_ANALYST_LLM_PROVIDER=none` for foundation checks that do not call
 an LLM. If an actual provider is configured later, an API key must be supplied.

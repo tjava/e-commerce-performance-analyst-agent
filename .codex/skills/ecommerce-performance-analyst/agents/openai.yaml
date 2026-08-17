@@ -1,0 +1,4 @@
+interface:
+  display_name: "E-commerce Performance Analyst"
+  short_description: "Project architecture guardrails"
+  default_prompt: "Use $ecommerce-performance-analyst before making architecture or implementation changes to this project."

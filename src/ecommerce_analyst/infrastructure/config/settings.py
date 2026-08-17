@@ -18,6 +18,7 @@ from pydantic import (
 )
 
 from ecommerce_analyst.domain.enums.environment import ApplicationEnvironment
+from ecommerce_analyst.domain.models import DatasetIngestionLimits
 
 _ENV_PREFIX = "ECOMMERCE_ANALYST_"
 
@@ -30,6 +31,7 @@ _ENV_TO_FIELD = {
     "RAW_DATA_DIR": "raw_data_dir",
     "PROCESSED_DATA_DIR": "processed_data_dir",
     "SAMPLE_DATA_DIR": "sample_data_dir",
+    "MAX_UPLOAD_SIZE_BYTES": "max_upload_size_bytes",
 }
 
 _VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
@@ -46,6 +48,7 @@ class Settings(BaseModel):
     raw_data_dir: Path = Path("data/raw")
     processed_data_dir: Path = Path("data/processed")
     sample_data_dir: Path = Path("data/sample")
+    max_upload_size_bytes: int = Field(default=10 * 1024 * 1024, gt=0)
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -82,6 +85,11 @@ class Settings(BaseModel):
                 "ECOMMERCE_ANALYST_LLM_PROVIDER is not 'none'."
             )
         return self
+
+    def dataset_ingestion_limits(self) -> DatasetIngestionLimits:
+        """Build ingestion limits from application settings."""
+
+        return DatasetIngestionLimits(max_file_size_bytes=self.max_upload_size_bytes)
 
 
 def load_settings(
