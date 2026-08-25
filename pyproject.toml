@@ -41,7 +41,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers --strict-config"
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 
 [tool.ruff]
