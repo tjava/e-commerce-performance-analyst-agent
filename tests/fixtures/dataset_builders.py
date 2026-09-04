@@ -6,6 +6,8 @@ allowing the domain validator and other services to be tested in isolation.
 
 from __future__ import annotations
 
+from typing import Any
+
 from ecommerce_analyst.domain.enums.dataset_file_type import DatasetFileType
 from ecommerce_analyst.domain.models.dataset import (
     CellValue,
@@ -24,35 +26,13 @@ def make_ingested_dataset(
     file_size_bytes: int = 1024,
     parsing_warnings: tuple[str, ...] = (),
 ) -> IngestedDataset:
-    """Build an ``IngestedDataset`` from a column spec and optional records.
-
-    Parameters
-    ----------
-    columns:
-        List of ``(name, inferred_dtype)`` tuples defining the schema.
-    records:
-        Optional list of record dicts.  Defaults to a single dummy row.
-    filename:
-        Filename stored in metadata (does not need to exist on disk).
-    file_type:
-        ``DatasetFileType`` enum value (defaults to CSV).
-    file_size_bytes:
-        Reported file size (defaults to 1024).
-    parsing_warnings:
-        Any parsing warnings to include in metadata.
-
-    Returns
-    -------
-    IngestedDataset
-        A fully valid, frozen dataset representation.
-    """
+    """Build an ``IngestedDataset`` from a column spec and optional records."""
     column_metadata = tuple(
         ColumnMetadata(index=i, name=name, inferred_dtype=dtype)
         for i, (name, dtype) in enumerate(columns)
     )
 
     if records is None:
-        # Build one synthetic row with a sensible default per dtype
         default_row: dict[str, CellValue] = {}
         for name, dtype in columns:
             if dtype.startswith("int"):
@@ -76,3 +56,41 @@ def make_ingested_dataset(
     )
 
     return IngestedDataset(metadata=metadata, records=records)
+
+
+def make_ecommerce_dataset(
+    *,
+    records: list[dict[str, Any]] | None = None,
+    row_count: int = 5,
+    filename: str = "orders.csv",
+) -> IngestedDataset:
+    """Build a standard, clean e-commerce IngestedDataset for testing."""
+    columns = [
+        ("order_id", "int64"),
+        ("product_id", "object"),
+        ("price", "float64"),
+        ("quantity", "int64"),
+        ("order_date", "object"),
+        ("customer_id", "object"),
+        ("category", "object"),
+    ]
+
+    if records is None:
+        records = [
+            {
+                "order_id": 1000 + i,
+                "product_id": f"PROD-{i % 3 + 1}",
+                "price": round(19.99 + (i * 10.0), 2),
+                "quantity": (i % 4) + 1,
+                "order_date": f"2024-01-0{i % 8 + 1}",
+                "customer_id": f"CUST-{i % 2 + 1}",
+                "category": "Electronics" if i % 2 == 0 else "Apparel",
+            }
+            for i in range(row_count)
+        ]
+
+    return make_ingested_dataset(
+        columns=columns,
+        records=records,
+        filename=filename,
+    )
