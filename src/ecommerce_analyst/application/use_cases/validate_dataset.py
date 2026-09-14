@@ -25,9 +25,7 @@ class ValidateDatasetUseCase:
             ...
     """
 
-    validator: EcommerceDomainValidator = field(
-        default_factory=EcommerceDomainValidator
-    )
+    validator: EcommerceDomainValidator = field(default_factory=EcommerceDomainValidator)
 
     def execute(self, dataset: IngestedDataset) -> DomainValidationResult:
         """Run domain validation on a technically loaded dataset.

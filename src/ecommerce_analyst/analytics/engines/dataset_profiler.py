@@ -72,9 +72,7 @@ class DatasetProfiler:
 
         # 1. Dataset Overview
         duplicate_rows = int(df.duplicated().sum()) if total_rows > 0 else 0
-        duplicate_pct = (
-            round((duplicate_rows / total_rows) * 100.0, 2) if total_rows > 0 else 0.0
-        )
+        duplicate_pct = round((duplicate_rows / total_rows) * 100.0, 2) if total_rows > 0 else 0.0
         overview = DatasetOverview(
             filename=dataset.metadata.filename,
             row_count=total_rows,
@@ -597,9 +595,7 @@ def _identify_analytical_dimensions(column_profiles: list[ColumnProfile]) -> lis
         # Exclude constant columns or columns with critical null rates
         if cp.is_constant or cp.null_pct >= 80.0:
             continue
-        has_cardinality = (
-            cp.categorical_stats is not None and 1 < cp.unique_count <= 100
-        )
+        has_cardinality = cp.categorical_stats is not None and 1 < cp.unique_count <= 100
         if cp.role in dimension_roles or has_cardinality:
             dims.append(cp.name)
 

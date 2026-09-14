@@ -32,6 +32,7 @@ from tests.fixtures.dataset_builders import make_ingested_dataset
 # Shared validator instance (stateless — safe to reuse)
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def validator() -> EcommerceDomainValidator:
     return EcommerceDomainValidator()
@@ -45,6 +46,7 @@ def use_case(validator: EcommerceDomainValidator) -> ValidateDatasetUseCase:
 # ===========================================================================
 # 1. Clearly valid e-commerce dataset → PASS
 # ===========================================================================
+
 
 class TestClearlyValidEcommerce:
     """A canonical e-commerce dataset with all core and several optional signals."""
@@ -133,8 +135,8 @@ class TestClearlyValidEcommerce:
 # 2. Clearly unrelated HR / payroll dataset → REJECT
 # ===========================================================================
 
-class TestHRDatasetRejected:
 
+class TestHRDatasetRejected:
     def test_decision_is_reject(self, validator: EcommerceDomainValidator) -> None:
         dataset = make_ingested_dataset(
             columns=[
@@ -194,8 +196,8 @@ class TestHRDatasetRejected:
 # 3. Finance / accounting dataset → REJECT
 # ===========================================================================
 
-class TestFinanceDatasetRejected:
 
+class TestFinanceDatasetRejected:
     def test_decision_is_reject(self, validator: EcommerceDomainValidator) -> None:
         dataset = make_ingested_dataset(
             columns=[
@@ -225,16 +227,16 @@ class TestFinanceDatasetRejected:
 # 4. E-commerce dataset with unusual column names → PASS via semantic matching
 # ===========================================================================
 
-class TestUnusualColumnNames:
 
+class TestUnusualColumnNames:
     def test_txn_ref_sku_code_sale_amt_pass(self, validator: EcommerceDomainValidator) -> None:
         """Unusual but semantically clear names should still match via aliases/keywords."""
         dataset = make_ingested_dataset(
             columns=[
-                ("txn_ref", "object"),       # → order_identifier (exact alias)
-                ("sku_code", "object"),      # → product_identifier (exact alias)
-                ("sale_amt", "float64"),     # → revenue_or_price (exact alias)
-                ("purchase_dt", "object"),   # → transaction_date (keyword hint)
+                ("txn_ref", "object"),  # → order_identifier (exact alias)
+                ("sku_code", "object"),  # → product_identifier (exact alias)
+                ("sale_amt", "float64"),  # → revenue_or_price (exact alias)
+                ("purchase_dt", "object"),  # → transaction_date (keyword hint)
             ],
             records=[
                 {
@@ -253,8 +255,8 @@ class TestUnusualColumnNames:
     ) -> None:
         dataset = make_ingested_dataset(
             columns=[
-                ("invoice_id", "object"),    # order_identifier alias
-                ("asin", "object"),          # product_identifier alias
+                ("invoice_id", "object"),  # order_identifier alias
+                ("asin", "object"),  # product_identifier alias
                 ("net_revenue", "float64"),  # revenue_or_price alias
             ],
         )
@@ -267,9 +269,9 @@ class TestUnusualColumnNames:
     def test_match_type_recorded_correctly(self, validator: EcommerceDomainValidator) -> None:
         dataset = make_ingested_dataset(
             columns=[
-                ("order_id", "int64"),       # exact alias
+                ("order_id", "int64"),  # exact alias
                 ("my_product_ref", "object"),  # keyword match on 'product'
-                ("total", "float64"),        # exact alias
+                ("total", "float64"),  # exact alias
             ],
         )
         result = validator.validate(dataset)
@@ -282,8 +284,8 @@ class TestUnusualColumnNames:
 # 5. Minimal but valid e-commerce dataset → PASS_LIMITED or PASS
 # ===========================================================================
 
-class TestMinimalDataset:
 
+class TestMinimalDataset:
     def test_three_required_signals_only_accepted(
         self, validator: EcommerceDomainValidator
     ) -> None:
@@ -344,8 +346,8 @@ class TestMinimalDataset:
 # 6. E-commerce dataset missing optional customer info → PASS
 # ===========================================================================
 
-class TestMissingCustomerInfo:
 
+class TestMissingCustomerInfo:
     def test_pass_without_customer_id(self, validator: EcommerceDomainValidator) -> None:
         dataset = make_ingested_dataset(
             columns=[
@@ -392,8 +394,8 @@ class TestMissingCustomerInfo:
 # 7. E-commerce dataset missing pricing/revenue → REJECT
 # ===========================================================================
 
-class TestMissingPricing:
 
+class TestMissingPricing:
     def test_rejected_without_revenue_signal(self, validator: EcommerceDomainValidator) -> None:
         dataset = make_ingested_dataset(
             columns=[
@@ -426,8 +428,8 @@ class TestMissingPricing:
 # 8. Ambiguous dataset → UNCERTAIN, low confidence
 # ===========================================================================
 
-class TestAmbiguousDataset:
 
+class TestAmbiguousDataset:
     def test_date_and_amount_only_is_uncertain(self, validator: EcommerceDomainValidator) -> None:
         """date + amount without any product/order identifier is too ambiguous."""
         dataset = make_ingested_dataset(
@@ -467,8 +469,8 @@ class TestAmbiguousDataset:
 # 9. Wrong dtype / bad value patterns → warnings present
 # ===========================================================================
 
-class TestDtypeAndValueWarnings:
 
+class TestDtypeAndValueWarnings:
     def test_price_column_with_text_values_generates_warning(
         self, validator: EcommerceDomainValidator
     ) -> None:
@@ -522,8 +524,8 @@ class TestDtypeAndValueWarnings:
 # 10. Result is fully structured and deterministic
 # ===========================================================================
 
-class TestResultStructure:
 
+class TestResultStructure:
     def test_result_is_domain_validation_result_instance(
         self, validator: EcommerceDomainValidator
     ) -> None:
@@ -608,8 +610,8 @@ class TestResultStructure:
 # 11. No LLM required — validator has no external I/O
 # ===========================================================================
 
-class TestNoLLMRequired:
 
+class TestNoLLMRequired:
     def test_validator_has_no_llm_dependency(self, validator: EcommerceDomainValidator) -> None:
         """EcommerceDomainValidator must not hold a reference to any LLM client."""
         # Check it's a plain dataclass with no llm-related attributes
@@ -646,11 +648,9 @@ class TestNoLLMRequired:
 # 12. No actual analysis performed — result is schema-only
 # ===========================================================================
 
-class TestNoAnalysisPerformed:
 
-    def test_result_contains_no_computed_metrics(
-        self, validator: EcommerceDomainValidator
-    ) -> None:
+class TestNoAnalysisPerformed:
+    def test_result_contains_no_computed_metrics(self, validator: EcommerceDomainValidator) -> None:
         """DomainValidationResult must not have revenue totals, averages, or computed metrics."""
         dataset = make_ingested_dataset(
             columns=[("order_id", "int64"), ("product_id", "object"), ("total", "float64")],
@@ -663,8 +663,15 @@ class TestNoAnalysisPerformed:
         result_dict = result.model_dump()
         # No analysis-related keys should exist
         analysis_keys = {
-            "total_revenue", "average_order_value", "top_products", "revenue_by_date",
-            "metrics", "analysis", "report", "chart", "insights",
+            "total_revenue",
+            "average_order_value",
+            "top_products",
+            "revenue_by_date",
+            "metrics",
+            "analysis",
+            "report",
+            "chart",
+            "insights",
         }
         assert analysis_keys.isdisjoint(result_dict.keys()), (
             f"Result contains unexpected analysis keys: {analysis_keys & result_dict.keys()}"
@@ -691,8 +698,8 @@ class TestNoAnalysisPerformed:
 # Additional edge cases and boundary conditions
 # ===========================================================================
 
-class TestEdgeCases:
 
+class TestEdgeCases:
     def test_empty_optional_signals_do_not_affect_required_detection(
         self, validator: EcommerceDomainValidator
     ) -> None:

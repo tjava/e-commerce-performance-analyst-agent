@@ -158,7 +158,8 @@ class TestMissingAndNullValues:
         assert QualityIssueCode.HIGH_NULL_RATE in issue_codes
 
         rev_assessment = next(
-            a for a in profile.capability_assessments
+            a
+            for a in profile.capability_assessments
             if a.capability == EcommerceCapability.REVENUE_ANALYSIS
         )
         assert rev_assessment.available is True
@@ -195,7 +196,8 @@ class TestMissingAndNullValues:
         assert any(b.code == QualityIssueCode.CRITICAL_NULL_RATE for b in blocking)
 
         rev_assessment = next(
-            a for a in profile.capability_assessments
+            a
+            for a in profile.capability_assessments
             if a.capability == EcommerceCapability.REVENUE_ANALYSIS
         )
         assert rev_assessment.available is False
@@ -326,7 +328,8 @@ class TestDateAnomalies:
         profile = profiling_service.profile(dataset, val_result)
 
         trend_cap = next(
-            a for a in profile.capability_assessments
+            a
+            for a in profile.capability_assessments
             if a.capability == EcommerceCapability.TREND_ANALYSIS
         )
         assert trend_cap.available is False
@@ -401,7 +404,8 @@ class TestCapabilityAndDimensionInference:
         profile = profiling_service.profile(dataset, val_result)
 
         cust_cap = next(
-            a for a in profile.capability_assessments
+            a
+            for a in profile.capability_assessments
             if a.capability == EcommerceCapability.CUSTOMER_ANALYSIS
         )
         assert cust_cap.available is False

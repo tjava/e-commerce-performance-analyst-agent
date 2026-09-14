@@ -370,8 +370,7 @@ def _build_explanation(
     match decision:
         case ValidationDecision.PASS:
             parts.append(
-                f"Dataset accepted as e-commerce transaction data "
-                f"(confidence: {confidence:.0%})."
+                f"Dataset accepted as e-commerce transaction data (confidence: {confidence:.0%})."
             )
         case ValidationDecision.PASS_LIMITED:
             parts.append(
@@ -416,8 +415,6 @@ def _build_explanation(
         parts.append(f"Available analytical capabilities: {caps_list}.")
     if unavailable_caps:
         unavail_list = ", ".join(c.value for c in unavailable_caps)
-        parts.append(
-            f"Unavailable capabilities (missing optional signals): {unavail_list}."
-        )
+        parts.append(f"Unavailable capabilities (missing optional signals): {unavail_list}.")
 
     return " ".join(parts)
